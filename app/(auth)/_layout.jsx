@@ -1,12 +1,16 @@
-import { StyleSheet, Text, View } from "react-native";
-import React from "react";
 import { Stack } from "expo-router";
+import React from "react";
+import { StatusBar } from "expo-status-bar";
 
 const AuthLayout = () => {
   return (
-    <Stack>
-      <Text>AuthLayout</Text>
-    </Stack>
+    <>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="sign-in" />
+        <Stack.Screen name="sign-up" />
+      </Stack>
+      <StatusBar backgroundColor={"#161622"} style="light" />
+    </>
   );
 };
 
