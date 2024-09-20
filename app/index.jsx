@@ -13,8 +13,8 @@ const App = () => {
           <Image source={images.logo} className="w-[130px] h-[60px]" resizeMode="contain" />
           <Image source={images.cards} className="max-w-[380px] w-full h-[298px]" resizeMode="contain" />
           <View className="relative mt-5">
-            <Text className="text-3xl text-white font-bold text-center">
-              Discover Endless Possibilities With <Text className="text-secondary-200">Aora</Text>
+            <Text className="text-2xl text-white font-pbold text-center">
+              Discover Endless{"\n"} Possibilities With <Text className="text-secondary-200">Aora</Text>
             </Text>
             <Image
               source={images.path}
