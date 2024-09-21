@@ -4,9 +4,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import FormField from "../../components/FormField";
 import { useState } from "react";
 import CustomButton from "../../components/CustomButton";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
+import { createUser, getCurrentUser } from "../../lib/appwrite";
+import { Alert } from "react-native";
+import { useGlobalContext } from "../../context/GlobalContext";
 
 const SignUp = () => {
+  const { setUser, setIsLoggedIn } = useGlobalContext();
   const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState({
     username: "",
@@ -14,7 +18,23 @@ const SignUp = () => {
     password: "",
   });
 
-  const submit = () => {};
+  const submit = async () => {
+    if (!form.username || !form.email || !form.password) {
+      return Alert.alert("Error", "Please fill all the fields");
+    }
+    try {
+      setIsLoading(true);
+      await createUser(form.email, form.password, form.username);
+      const user = await getCurrentUser();
+      setUser(user);
+      setIsLoggedIn(true);
+      router.replace("/home");
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView className="bg-primary h-full">
@@ -46,7 +66,7 @@ const SignUp = () => {
           />
           <CustomButton
             isLoading={isLoading}
-            title={"Sign in"}
+            title={"Sign Up"}
             handlePress={submit}
             containerStyles="w-full mt-7"
           />
