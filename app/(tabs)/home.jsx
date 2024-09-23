@@ -1,33 +1,44 @@
-import { View, Text, FlatList, Image, RefreshControl } from "react-native";
 import React, { useState } from "react";
+import { FlatList, Image, RefreshControl, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { images } from "../../constants";
+import EmptyState from "../../components/EmptyState";
 import SearchInput from "../../components/SearchInput";
 import Trending from "../../components/Trending";
-import EmptyState from "../../components/EmptyState";
+import { images } from "../../constants";
+import useAppwrite from "../../hooks/useAppwrite";
+import { fetchAllPosts, fetchLatestPosts } from "../../lib/appwrite";
+import VideoCard from "../../components/VideoCard";
 
 const Home = () => {
   const [search, setSearch] = useState("");
   const [refreshing, setRefreshing] = useState(false);
+
+  const { data: posts, refetch } = useAppwrite(fetchAllPosts);
+  const { data: latestPosts } = useAppwrite(fetchLatestPosts);
+
   const onRefresh = async () => {
     setRefreshing(true);
-    setTimeout(() => {
+    try {
+      await refetch();
+    } catch (error) {
+      console.log(error);
+    } finally {
       setRefreshing(false);
-    }, 2000);
+    }
   };
+
   return (
     <SafeAreaView className="bg-primary h-full">
       <FlatList
-        data={[{ id: 1 }, { id: 2 }]}
-        // data={[]}
-        keyExtractor={(item) => item.id}
+        data={posts ?? []}
+        keyExtractor={(item) => item.$id}
         renderItem={({ item }) => {
-          return <Text className="text-white text-2xl font-bold">{item.id}</Text>;
+          return <VideoCard post={item} />;
         }}
-        ListHeaderComponent={({ item }) => {
+        ListHeaderComponent={() => {
           return (
-            <View className="my-6 px-4 space-y-6">
-              <View className="justify-between items-start flex-row mb-6">
+            <View className="my-3 px-4 space-y-6">
+              <View className="justify-between items-start flex-row mb-4">
                 <View>
                   <Text className="font-pmedium text-sm text-gray-100 ">Welcome back</Text>
                   <Text className="font-psemibold text-xl text-white">Hamza Nafasat</Text>
@@ -39,9 +50,9 @@ const Home = () => {
                 value={search}
                 handleChangeText={(e) => setSearch(e)}
               />
-              <View className="w-full pt-5 flex-1">
-                <Text className="text-gray-100 text-lg mb-3 font-pregular ">Latest Videos</Text>
-                <Trending posts={[{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }] ?? []} />
+              <View className="w-full pt-0 flex-1">
+                <Text className="text-gray-100 text-lg mb-2 font-pregular ">Latest Videos</Text>
+                <Trending posts={latestPosts ?? []} />
               </View>
             </View>
           );
