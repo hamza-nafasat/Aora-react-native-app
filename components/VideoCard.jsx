@@ -3,7 +3,7 @@ import { View, Text, Image } from "react-native";
 import { icons } from "../constants";
 import { useState } from "react";
 import { TouchableOpacity } from "react-native";
-import { ResizeMode, Video } from "expo-av";
+import { WebView } from "react-native-webview";
 
 const VideoCard = ({
   post: {
@@ -14,6 +14,12 @@ const VideoCard = ({
   },
 }) => {
   const [play, setPlay] = useState(false);
+
+  const handlePlaybackStatusUpdate = (status) => {
+    if (status.didJustFinish) {
+      setPlay(false);
+    }
+  };
   return (
     <View className="flex-col items-center px-4 mb-14 ">
       <View className="flex-row gap-3 items-start">
@@ -36,12 +42,13 @@ const VideoCard = ({
       </View>
 
       {play ? (
-        <Video
+        <WebView
           source={{ uri: video }}
-          className="h-72 w-52 rounded-[35px] mt-3 bg-white/10 "
-          resizeMode={ResizeMode.CONTAIN}
-          useNativeControls
-          shouldPlay
+          onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
+          allowsInlineMediaPlayback
+          mediaPlaybackRequiresUserAction={false}
+          allowsFullscreenVideo
+          className="w-52 h-72 rounded-[33px] mt-3 bg-white/10"
         />
       ) : (
         <TouchableOpacity
