@@ -62,11 +62,7 @@ const Home = () => {
               </View>
               <Image source={images.logoSmall} className="w-9 h-10" resizeMode="contain" />
             </View>
-            <SearchInput
-              placeholder="Search for a video topic"
-              value={search}
-              handleChangeText={(e) => setSearch(e)}
-            />
+            <SearchInput />
             <View className="w-full pt-0 flex-1">
               <Text className="text-gray-100 text-lg mb-2 font-pregular ">Latest Videos</Text>
               <Trending posts={latestPosts ?? []} />
