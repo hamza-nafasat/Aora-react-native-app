@@ -1,75 +1,36 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { FlatList, Image, ImageBackground, TouchableOpacity } from "react-native";
 import * as Animatable from "react-native-animatable";
-import { ResizeMode, Video } from "expo-av";
-import { icons } from "../constants";
 import WebView from "react-native-webview";
+import { icons } from "../constants";
 
 const zoomIn = {
   0: { scale: 0.9 },
   1: { scale: 1.1 },
 };
+
 const zoomOut = {
   0: { scale: 1.1 },
   1: { scale: 0.9 },
 };
 
-const Trending = ({ posts }) => {
-  const [active, setActive] = useState(posts[0]);
-
-  const viewableItemsChanged = ({ viewableItems }) => {
-    if (viewableItems && viewableItems.length > 0) {
-      setActive(viewableItems[0].key);
-    }
-  };
-
-  return (
-    <FlatList
-      data={posts}
-      horizontal
-      keyExtractor={(item) => item.$id}
-      renderItem={({ item }) => {
-        return <TrendingItem activeItem={active} item={item} />;
-      }}
-      onViewableItemsChanged={viewableItemsChanged}
-      viewabilityConfig={{
-        itemVisiblePercentThreshold: 70,
-      }}
-      contentOffset={{ x: 170 }}
-    />
-  );
-};
-
-export default Trending;
-
-const TrendingItem = ({ activeItem, item }) => {
-  const [play, setPlay] = useState(false);
-  const videoRef = useRef(null);
-
-  console.log(item.video);
-
-  const handlePlaybackStatusUpdate = (status) => {
-    if (status.didJustFinish) {
-      setPlay(false);
-    }
-  };
-
+const TrendingItem = ({ activeItem, item, isPlaying, onPlay }) => {
   return (
     <Animatable.View className="mr-5" animation={activeItem === item.$id ? zoomIn : zoomOut} duration={500}>
-      {play ? (
+      {isPlaying ? (
         <WebView
           source={{ uri: item.video }}
-          onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
           allowsInlineMediaPlayback
           mediaPlaybackRequiresUserAction={false}
           allowsFullscreenVideo
-          className="w-52 h-72 rounded-[33px] mt-3 bg-white/10"
+          className="w-52 h-72 bg-transparent"
+          useWebKit
         />
       ) : (
         <TouchableOpacity
           className="relative justify-center items-center"
           activeOpacity={0.7}
-          onPress={() => setPlay(true)}
+          onPress={() => onPlay(item.$id, true)} // Play video and mark as playing
         >
           <ImageBackground
             source={{ uri: item.thumbnail }}
@@ -82,3 +43,54 @@ const TrendingItem = ({ activeItem, item }) => {
     </Animatable.View>
   );
 };
+
+const Trending = ({ posts }) => {
+  const [active, setActive] = useState(posts[0]);
+  const [playingStates, setPlayingStates] = useState({});
+
+  const viewableItemsChanged = ({ viewableItems }) => {
+    if (viewableItems && viewableItems.length > 0) {
+      setActive(viewableItems[0].key);
+    }
+  };
+
+  const handlePlay = (id, isPlaying) => {
+    setPlayingStates((prevStates) => ({
+      ...prevStates,
+      [id]: isPlaying,
+    }));
+
+    if (isPlaying) {
+      setPlayingStates((prevStates) => {
+        const newStates = {};
+        for (const key in prevStates) {
+          newStates[key] = key === id ? true : false;
+        }
+        return newStates;
+      });
+    }
+  };
+
+  return (
+    <FlatList
+      data={posts}
+      horizontal
+      keyExtractor={(item) => item.$id}
+      renderItem={({ item }) => (
+        <TrendingItem
+          activeItem={active}
+          item={item}
+          isPlaying={playingStates[item.$id]}
+          onPlay={handlePlay}
+        />
+      )}
+      onViewableItemsChanged={viewableItemsChanged}
+      viewabilityConfig={{
+        itemVisiblePercentThreshold: 70,
+      }}
+      contentOffset={{ x: 170 }}
+    />
+  );
+};
+
+export default Trending;

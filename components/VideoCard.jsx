@@ -1,5 +1,4 @@
 import { View, Text, Image } from "react-native";
-
 import { icons } from "../constants";
 import { useState } from "react";
 import { TouchableOpacity } from "react-native";
@@ -7,19 +6,19 @@ import { WebView } from "react-native-webview";
 
 const VideoCard = ({
   post: {
+    $id,
     title,
     thumbnail,
     video,
     creator: { username, avatar },
   },
+  isPlaying,
+  onPlay,
 }) => {
-  const [play, setPlay] = useState(false);
-
   const handlePlaybackStatusUpdate = (status) => {
-    if (status.didJustFinish) {
-      setPlay(false);
-    }
+    if (status.didJustFinish) onPlay($id, false);
   };
+
   return (
     <View className="flex-col items-center px-4 mb-14 ">
       <View className="flex-row gap-3 items-start">
@@ -41,20 +40,20 @@ const VideoCard = ({
         </View>
       </View>
 
-      {play ? (
+      {isPlaying ? (
         <WebView
           source={{ uri: video }}
-          onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
+          onMessage={handlePlaybackStatusUpdate}
           allowsInlineMediaPlayback
           mediaPlaybackRequiresUserAction={false}
           allowsFullscreenVideo
-          className="w-52 h-72 rounded-[33px] mt-3 bg-white/10"
+          className="w-[100vw] h-72 rounded-lg bg-black"
         />
       ) : (
         <TouchableOpacity
           activeOpacity={0.8}
           className="w-full h-60 rounded-xl mt-3 relative justify-center items-center"
-          onPress={() => setPlay(true)}
+          onPress={() => onPlay($id, true)}
         >
           <Image
             source={{ uri: thumbnail }}
