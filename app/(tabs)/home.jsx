@@ -8,8 +8,10 @@ import { images } from "../../constants";
 import useAppwrite from "../../hooks/useAppwrite";
 import { fetchAllPosts, fetchLatestPosts } from "../../lib/appwrite";
 import VideoCard from "../../components/VideoCard";
+import { useGlobalContext } from "../../context/GlobalContext";
 
 const Home = () => {
+  const { user } = useGlobalContext();
   const { data: posts, refetch } = useAppwrite(fetchAllPosts);
   const { data: latestPosts, refetch: refetchLatest } = useAppwrite(fetchLatestPosts);
 
@@ -58,7 +60,7 @@ const Home = () => {
             <View className="justify-between items-start flex-row mb-4">
               <View>
                 <Text className="font-pmedium text-sm text-gray-100 ">Welcome back</Text>
-                <Text className="font-psemibold text-xl text-white">Hamza Nafasat</Text>
+                <Text className="font-psemibold text-xl text-white">{user?.username}</Text>
               </View>
               <Image source={images.logoSmall} className="w-9 h-10" resizeMode="contain" />
             </View>

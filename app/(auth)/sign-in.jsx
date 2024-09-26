@@ -1,10 +1,10 @@
 import { images } from "../../constants";
-import { Image, ScrollView, Text, View } from "react-native";
+import { Alert, Image, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import FormField from "../../components/FormField";
 import { useState } from "react";
 import CustomButton from "../../components/CustomButton";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { getCurrentUser, signInUser } from "../../lib/appwrite";
 import { useGlobalContext } from "../../context/GlobalContext";
 
